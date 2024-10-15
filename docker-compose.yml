@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"  # Expose backend for both environments
+    depends_on:
+      - db
+      - selenium  # Ensure selenium is ready before backend
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/market_engine  # Use internal Docker service name for DB
+      - SELENIUM_DRIVER_NAME=chrome  # Selenium driver
+      - SELENIUM_DRIVER_EXECUTABLE_PATH=http://selenium:4444/wd/hub  # Remote WebDriver
+    volumes:
+      - ./backend:/app  # Mount backend code for development (removed in production)
+    networks:
+      - market-engine-network
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"  # Expose frontend on port 3000
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app  # Local mount for development
+    networks:
+      - market-engine-network
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: market_engine
+    volumes:
+      - db-data:/var/lib/postgresql/data  # Persistent storage for production
+    networks:
+      - market-engine-network
+
+  selenium:
+    image: selenium/standalone-chrome:latest  # Latest Selenium Chrome image
+    ports:
+      - "4444:4444"  # Expose Selenium WebDriver (for development only)
+    volumes:
+      - /dev/shm:/dev/shm  # Improve performance by sharing memory
+    networks:
+      - market-engine-network
+
+volumes:
+  db-data:  # Persistent volume for database
+
+networks:
+  market-engine-network:
+    driver: bridge

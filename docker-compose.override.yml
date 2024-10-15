@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  backend:
+    ports:
+      - "8000:8000"  # Expose backend for local development
+    environment:
+      FLASK_ENV: development  # Set development environment
+    volumes:
+      - ./backend:/app  # Mount code for local development and hot-reloading
+
+  frontend:
+    ports:
+      - "3000:3000"  # Expose frontend for local access
+    volumes:
+      - ./frontend:/app  # Mount code for development
+
+  db:
+    ports:
+      - "5432:5432"  # Expose Postgres for local access (e.g., pgAdmin)
+
+  selenium:
+    ports:
+      - "4444:4444"  # Expose Selenium WebDriver for local browser automation testing
