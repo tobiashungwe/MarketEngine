@@ -1,7 +1,7 @@
 import scrapy
 from scrapy_selenium import SeleniumRequest
-import scrapy_selenium
 from ..items.company_item import CompanyItem
+from ...use_cases.crawl_companies import CrawlCompanies
 
 class CompanySpider(scrapy.Spider):
     name = 'company_spider'
@@ -11,7 +11,13 @@ class CompanySpider(scrapy.Spider):
     custom_settings = {
         'DOWNLOADER_MIDDLEWARES': {
             'scrapy_selenium.SeleniumMiddleware': 800
-        }
+        },
+        'ROTATING_PROXY_LIST': [
+            'proxy1.com:8000',
+            'proxy2.com:8031',
+            # Add more proxies as needed
+        ],
+        'USER_AGENT': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"
     }
 
     def start_requests(self):
