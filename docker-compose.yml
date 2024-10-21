@@ -33,11 +33,11 @@ services:
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: market_engine
+      POSTGRES_DB: market_engine_db
     volumes:
-      - db-data:/var/lib/postgresql/data  # Persistent storage for production
-    networks:
-      - market-engine-network
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
 
   selenium:
     image: selenium/standalone-chrome:latest  # Latest Selenium Chrome image

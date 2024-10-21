@@ -1,23 +1,21 @@
 import scrapy
 from scrapy_selenium import SeleniumRequest
 from ..items.company_item import CompanyItem
-from ...use_cases.crawl_companies import CrawlCompanies
 
-class CompanySpider(scrapy.Spider):
-    name = 'company_spider'
-    allowed_domains = ['example.com']
-    start_urls = ['https://example.com/companies']
+class DynamicSpider(scrapy.Spider):
+    name = 'dynamic_spider'
+    allowed_domains = ['dynamic-example.com']
+    start_urls = ['https://dynamic-example.com/companies']
 
     custom_settings = {
         'DOWNLOADER_MIDDLEWARES': {
             'scrapy_selenium.SeleniumMiddleware': 800
         },
+        'SELENIUM_DRIVER_ARGUMENTS': ['--headless', '--disable-gpu'],
         'ROTATING_PROXY_LIST': [
             'proxy1.com:8000',
-            'proxy2.com:8031',
-           
+            'proxy2.com:8031'
         ],
-        'USER_AGENT': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"
     }
 
     def start_requests(self):
@@ -32,6 +30,7 @@ class CompanySpider(scrapy.Spider):
             )
 
     def parse(self, response):
+        # Extract company links
         for company in response.css('div.company-listing'):
             company_url = company.css('a::attr(href)').get()
             if company_url:
