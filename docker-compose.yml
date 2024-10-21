@@ -9,7 +9,7 @@ services:
       - db
       - selenium  # Ensure selenium is ready before backend
     environment:
-      - DATABASE_URL=postgresql://user:password@db:5432/market_engine  # Use internal Docker service name for DB
+      - DATABASE_URL=postgresql://user:password@db:5432/market_engine_db  # Use internal Docker service name for DB
       - SELENIUM_DRIVER_NAME=chrome  # Selenium driver
       - SELENIUM_DRIVER_EXECUTABLE_PATH=http://selenium:4444/wd/hub  # Remote WebDriver
     volumes:
