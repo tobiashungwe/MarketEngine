@@ -2,6 +2,10 @@ import scrapy
 from scrapy_selenium import SeleniumRequest
 from ..items.company_item import CompanyItem
 from ...use_cases.crawl_companies import CrawlCompanies
+from scrapy_selenium import SeleniumRequest
+import time
+import requests
+import os
 
 class CompanySpider(scrapy.Spider):
     name = 'company_spider'
@@ -41,6 +45,18 @@ class CompanySpider(scrapy.Spider):
                 )
 
     def parse_company(self, response):
+        driver = response.meta['driver']
+        # Check for CAPTCHA
+        if "captcha" in driver.page_source.lower():
+            self.solve_captcha(driver)
+            time.sleep(2)  # Wait for the CAPTCHA to be solved
+            yield SeleniumRequest(
+                url=response.url,
+                callback=self.parse_company
+            )
+            return
+
+        # Existing parsing logic
         item = CompanyItem()
         item['name'] = response.css('h1::text').get().strip()
         email = response.css('a.email::attr(href)').get()
@@ -51,3 +67,38 @@ class CompanySpider(scrapy.Spider):
         item['address'] = response.css('div.address::text').get().strip()
         item['industry'] = response.css('div.industry::text').get().strip()
         yield item
+    
+    def solve_captcha(self, driver):
+        # Extract CAPTCHA image source
+        captcha_image = driver.find_element_by_css_selector("img.captcha").get_attribute("src")
+        # Download CAPTCHA image
+        captcha_response = requests.get(captcha_image)
+        with open("captcha.png", "wb") as f:
+            f.write(captcha_response.content)
+        
+        # Send CAPTCHA to solving service
+        api_key = os.getenv('CAPTCHA_API_KEY')
+        with open("captcha.png", "rb") as f:
+            response = requests.post(
+                "http://2captcha.com/in.php",
+                files={"file": f},
+                data={"key": api_key, "method": "post"}
+            )
+        captcha_id = response.text.split('|')[1]
+
+        # Poll for CAPTCHA result
+        solved = False
+        for _ in range(20):
+            time.sleep(5)
+            result = requests.get(
+                f"http://2captcha.com/res.php?key={api_key}&action=get&id={captcha_id}"
+            ).text
+            if result.startswith("OK|"):
+                captcha_text = result.split('|')[1]
+                driver.find_element_by_css_selector("input.captcha").send_keys(captcha_text)
+                driver.find_element_by_css_selector("button.submit").click()
+                solved = True
+                break
+
+        if not solved:
+            self.logger.error("Failed to solve CAPTCHA")
