@@ -54,7 +54,7 @@ DOWNLOADER_MIDDLEWARES.update({
     'scrapy.downloadermiddlewares.retry.RetryMiddleware': 90,
     'scrapy_rotating_proxies.middlewares.RotatingProxyMiddleware': 610,
     'scrapy_rotating_proxies.middlewares.BanDetectionMiddleware': 620,
-    'backend.crawlers.interface_adapters.middlewares.RandomUserAgentMiddleware': 400
+    'backend.crawlers.interface_adapters.middlewares.random_user_agent.RandomUserAgentMiddleware': 400
 })
 
 # Scrapy Rotating Proxies Settings
