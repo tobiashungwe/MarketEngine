@@ -1,6 +1,16 @@
 version: '3.8'
 
 services:
+  crawler:
+    build: .
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/market_engine_db
+    command: scrapy crawl company_spider
+    
   backend:
     build: ./backend
     ports:

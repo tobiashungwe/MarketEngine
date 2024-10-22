@@ -1,23 +1,19 @@
-# Use official Python image as base
-FROM python:3.9-slim
+FROM python:3.10-slim
 
-# Set work directory
+# Set the working directory
 WORKDIR /app
 
-# Install Pipenv
-RUN pip install pipenv
+# Copy the Pipfile and Pipfile.lock for Pipenv setup
+COPY Pipfile* /app/
 
-# Copy Pipfile and Pipfile.lock
-COPY Pipfile Pipfile.lock ./
+# Install pipenv and project dependencies
+RUN pip install pipenv && pipenv install --system --deploy
 
-# Install dependencies with Pipenv
-RUN pipenv install --system --deploy
+# Copy the rest of the project files
+COPY . /app
 
-# Copy the rest of the application
-COPY . .
+# Set environment variable for Scrapy settings
+ENV SCRAPY_SETTINGS_MODULE=backend.crawlers.interface_adapters.settings
 
-# Expose the application port
-EXPOSE 8000
-
-# Run the FastAPI app
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Set the command to run the Scrapy spider
+CMD ["scrapy", "crawl", "company_spider"]
