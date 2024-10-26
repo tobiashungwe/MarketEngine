@@ -1,5 +1,9 @@
 import streamlit as st
 from scrape import scrape, split_dom_content, clean_content, extract_content
+
+from parse import parse_with_ollama 
+
+
 # Set the title of the app
 st.title('Machine Engine')
 
@@ -28,4 +32,6 @@ if "dom_content" in st.session_state:
         if parse_description:
             st.write("Parsing content")
             dom_chunks = split_dom_content(st.session_state.dom_content)
+            result = parse_with_ollama(dom_chunks, parse_description)
+            st.write(result)
             
