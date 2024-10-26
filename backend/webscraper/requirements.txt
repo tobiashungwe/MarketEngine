@@ -6,3 +6,9 @@ beautifulsoup4
 lxml 
 html5lib
 python-dotenv
+transformers
+torch
+pandas
+sentencepiece
+google-api-python-client
+python-dotenv
