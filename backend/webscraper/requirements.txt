@@ -12,3 +12,5 @@ pandas
 sentencepiece
 google-api-python-client
 python-dotenv
+requests
+fake_useragent 
