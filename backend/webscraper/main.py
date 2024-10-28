@@ -99,7 +99,7 @@ if "confirmed_urls" in st.session_state and st.session_state["confirmed_urls"]:
     # Display companies with links in a checkbox list
     st.subheader("Select Companies for Outreach")
     if company_data_list:
-        for company_entry in company_data_list:
+        for index, company_entry in enumerate(company_data_list):
             if ":" in company_entry:
                 parts = company_entry.split(": ")
                 company_name = parts[0].strip()
@@ -107,7 +107,7 @@ if "confirmed_urls" in st.session_state and st.session_state["confirmed_urls"]:
 
                 # Only add companies with valid links to the checkbox list
                 if company_link and company_link.startswith("http"):
-                    checkbox_key = f"{company_name}_{company_link}"
+                    checkbox_key = f"{company_name}_{company_link}_{index}"
                     if st.checkbox(f"{company_name} - [Link]({company_link})", key=checkbox_key):
                         st.session_state["company_selection"][company_name] = company_link
 
