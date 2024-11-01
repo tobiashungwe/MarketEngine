@@ -14,3 +14,6 @@ google-api-python-client
 python-dotenv
 requests
 fake_useragent 
+spacy
+pyppeteer
+playwright
